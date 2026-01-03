@@ -17,6 +17,8 @@ local BEHIND_THRESHOLD = 3
 local BEHIND_SECONDS_TO_WASTED = 6
 local MAX_RACERS = 8
 
+local M = {}
+
 local function new_racer(id, is_ai)
 	return {
 		id = id,
@@ -129,7 +131,7 @@ local function evaluate_wasted(dispatcher, state, delta)
 	end
 end
 
-function match_init(context, params)
+function M.match_init(context, params)
 	local state = {
 		room_code = params.room_code or "AUTO",
 		roster = params.roster or {},
@@ -146,7 +148,7 @@ function match_init(context, params)
 	return state, state.tickrate, label
 end
 
-function match_join_attempt(context, dispatcher, tick, state, presence, metadata)
+function M.match_join_attempt(context, dispatcher, tick, state, presence, metadata)
 	for _, id in ipairs(state.roster) do
 		if id == presence.user_id then
 			return state, true
@@ -155,15 +157,15 @@ function match_join_attempt(context, dispatcher, tick, state, presence, metadata
 	return state, false, "late_join"
 end
 
-function match_join(context, dispatcher, tick, state, presences)
+function M.match_join(context, dispatcher, tick, state, presences)
 	return state
 end
 
-function match_leave(context, dispatcher, tick, state, presences)
+function M.match_leave(context, dispatcher, tick, state, presences)
 	return state
 end
 
-function match_loop(context, dispatcher, tick, state, messages)
+function M.match_loop(context, dispatcher, tick, state, messages)
 	local delta = 1 / state.tickrate
 	for _, m in ipairs(messages) do
 		if m.op_code == OP.RACE_INPUT then
@@ -205,10 +207,12 @@ function match_loop(context, dispatcher, tick, state, messages)
 	return state
 end
 
-function match_terminate(context, dispatcher, tick, state, grace)
+function M.match_terminate(context, dispatcher, tick, state, grace)
 	return nil
 end
 
-function match_signal(context, dispatcher, tick, state, data)
+function M.match_signal(context, dispatcher, tick, state, data)
 	return state
 end
+
+return M

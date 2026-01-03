@@ -11,6 +11,8 @@ local LOBBY_COUNTDOWN = 20
 local RESET_THRESHOLD = 10
 local MAX_RACERS = 8
 
+local M = {}
+
 local function new_state(params)
 	local code = params.room_code or room_code.generate()
 	return {
@@ -22,7 +24,7 @@ local function new_state(params)
 	}
 end
 
-local function broadcast_state(match_id, state)
+local function broadcast_state(dispatcher, state)
 	local players = {}
 	for _, p in pairs(state.humans) do
 		table.insert(players, p.username or "Racer")
@@ -32,23 +34,23 @@ local function broadcast_state(match_id, state)
 		countdown = state.countdown,
 		players = players,
 	}
-	nk.match_send_state(match_id, OP.LOBBY_STATE, nk.json_encode(data))
+	dispatcher.broadcast_message(OP.LOBBY_STATE, nk.json_encode(data))
 end
 
-function match_init(context, params)
+function M.match_init(context, params)
 	local state = new_state(params or {})
 	local label = nk.json_encode({game_id = GAME_ID, type = "lobby", room_code = state.room_code})
 	return state, 1, label
 end
 
-function match_join_attempt(context, dispatcher, tick, state, presence, metadata)
+function M.match_join_attempt(context, dispatcher, tick, state, presence, metadata)
 	if state.phase ~= "lobby" then
 		return state, false, "closed"
 	end
 	return state, true
 end
 
-function match_join(context, dispatcher, tick, state, presences)
+function M.match_join(context, dispatcher, tick, state, presences)
 	for _, p in ipairs(presences) do
 		state.humans[p.user_id] = p
 	end
@@ -58,22 +60,22 @@ function match_join(context, dispatcher, tick, state, presences)
 	if next(state.humans) ~= nil then
 		state.countdown_running = true
 	end
-	broadcast_state(context.match_id, state)
+	broadcast_state(dispatcher, state)
 	return state
 end
 
-function match_leave(context, dispatcher, tick, state, presences)
+function M.match_leave(context, dispatcher, tick, state, presences)
 	for _, p in ipairs(presences) do
 		state.humans[p.user_id] = nil
 	end
 	if next(state.humans) == nil then
 		return nil
 	end
-	broadcast_state(context.match_id, state)
+	broadcast_state(dispatcher, state)
 	return state
 end
 
-function match_loop(context, dispatcher, tick, state, messages)
+function M.match_loop(context, dispatcher, tick, state, messages)
 	for _, m in ipairs(messages) do end
 
 	if state.countdown_running and state.phase == "lobby" then
@@ -87,16 +89,18 @@ function match_loop(context, dispatcher, tick, state, messages)
 			local race_match_id = nk.match_create("race_match", {room_code = state.room_code, roster = roster})
 			dispatcher.broadcast_message(OP.LOBBY_RACE_START, nk.json_encode({race_match_id = race_match_id}))
 		else
-			broadcast_state(context.match_id, state)
+			broadcast_state(dispatcher, state)
 		end
 	end
 	return state
 end
 
-function match_terminate(context, dispatcher, tick, state, grace)
+function M.match_terminate(context, dispatcher, tick, state, grace)
 	return nil
 end
 
-function match_signal(context, dispatcher, tick, state, data)
+function M.match_signal(context, dispatcher, tick, state, data)
 	return state
 end
+
+return M

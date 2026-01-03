@@ -7,6 +7,7 @@ RUN apt-get update \
 
 # Copy nginx config template + startup script
 COPY nginx.conf.template /etc/nginx/nginx.conf.template
+COPY nakama/modules /nakama/data/modules
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 

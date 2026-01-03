@@ -7,6 +7,7 @@ if [ -z "${DATABASE_URL:-}" ]; then
 fi
 
 DB_ADDR="$(echo "$DATABASE_URL" | sed -E 's|^postgres(ql)?://||')"
+echo "Using DB address: $DB_ADDR"
 
 echo "Running Nakama migrations..."
 /nakama/nakama migrate up --database.address "$DB_ADDR"

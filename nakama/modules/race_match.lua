@@ -23,6 +23,14 @@ local DEFAULT_WAYPOINTS = {
 }
 
 local M = {}
+local function ensure_waypoints(state)
+	if not state.waypoints or #state.waypoints == 0 then
+		state.waypoints = DEFAULT_WAYPOINTS
+	end
+	if not state.checkpoints or state.checkpoints <= 0 then
+		state.checkpoints = #state.waypoints
+	end
+end
 
 local function new_racer(id, is_ai, spawn)
 	return {
@@ -77,6 +85,7 @@ local function update_progress(racer, state)
 end
 
 local function apply_input(racer, delta, state)
+	ensure_waypoints(state)
 	local speed = racer.input.throttle * 10 - racer.input.brake * 8
 	racer.pos.z = racer.pos.z - speed * delta
 	if racer.pos.z < -state.checkpoints * 50 then
@@ -100,8 +109,16 @@ local function apply_input(racer, delta, state)
 end
 
 local function ai_tick(racer, delta, state)
+	ensure_waypoints(state)
+	if #state.waypoints == 0 then
+		return
+	 end
+	if racer.waypoint < 1 or racer.waypoint > #state.waypoints then
+		racer.waypoint = 1
+	end
 	-- Follow the center-line waypoints around the oval.
 	local target = state.waypoints[racer.waypoint]
+	if not target then return end
 	local dx = target.x - racer.pos.x
 	local dz = target.z - racer.pos.z
 	local dist = math.sqrt(dx * dx + dz * dz)
@@ -207,6 +224,7 @@ function M.match_init(context, params)
 		spawns = spawns,
 		laps = track.laps or 2,
 	}
+	ensure_waypoints(state)
 	for _, id in ipairs(state.roster) do
 		local spawn = spawns[(#state.racers % #spawns) + 1]
 		table.insert(state.racers, new_racer(id, false, spawn))

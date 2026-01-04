@@ -137,9 +137,9 @@ local function ai_tick(racer, delta, state)
 	local dx = target.x - racer.pos.x
 	local dz = target.z - racer.pos.z
 	local dist = math.sqrt(dx * dx + dz * dz)
-	-- Rotate to face the target (Godot forward is -Z).
+	-- Rotate to face the target (Car forward uses +Z/basis.z).
 	if dist > 0.001 then
-		local yaw = math.atan2(dx, -dz)
+		local yaw = math.atan2(dx, dz)
 		racer.rot = {0, yaw, 0}
 	end
 	-- Advance to next waypoint when close enough.

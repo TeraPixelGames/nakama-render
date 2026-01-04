@@ -36,6 +36,7 @@ local serpentine = {
 		{180, 0.5, -160},
 		{60, 0.5, -200},
 	},
+	road_width = 12.0,
 	env = {
 		light_dir = {0.939693, -0.34202, 0.0},
 		light_energy = 2.5,

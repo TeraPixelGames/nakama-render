@@ -23,10 +23,25 @@ local DEFAULT_WAYPOINTS = {
 }
 
 local M = {}
-local function ensure_waypoints(state)
-	if not state.waypoints or #state.waypoints == 0 then
-		state.waypoints = DEFAULT_WAYPOINTS
+local function normalize_waypoints(list)
+	local out = {}
+	for _, w in ipairs(list or {}) do
+		if type(w) == "table" then
+			if w.x ~= nil and w.y ~= nil and w.z ~= nil then
+				table.insert(out, {x = w.x, y = w.y, z = w.z})
+			elseif #w >= 3 then
+				table.insert(out, {x = w[1], y = w[2], z = w[3]})
+			end
+		end
 	end
+	if #out == 0 then
+		out = DEFAULT_WAYPOINTS
+	end
+	return out
+end
+
+local function ensure_waypoints(state)
+	state.waypoints = normalize_waypoints(state.waypoints)
 	if not state.checkpoints or state.checkpoints <= 0 then
 		state.checkpoints = #state.waypoints
 	end

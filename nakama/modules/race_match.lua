@@ -245,7 +245,7 @@ function M.match_init(context, params)
 		table.insert(state.racers, new_racer(id, false, spawn))
 	end
 	add_ai_racers(state)
-	local label = nk.json_encode({game_id = GAME_ID, type = "race", room_code = state.room_code, track = track})
+	local label = nk.json_encode({game_id = GAME_ID, type = "race", room_code = state.room_code})
 	return state, state.tickrate, label
 end
 

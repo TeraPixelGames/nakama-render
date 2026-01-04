@@ -11,22 +11,22 @@ local serpentine = {
 	tiles = {}, -- unused for road mesh approach
 	walls = {}, -- no discrete walls; collision handled via mesh
 	bounds = {
-		{type = "box", size = {260, 6, 2}, pos = {0, 0, 150}, axis = "z"},
-		{type = "box", size = {260, 6, 2}, pos = {0, 0, -150}, axis = "z"},
-		{type = "box", size = {2, 6, 260}, pos = {150, 0, 0}, axis = "x"},
-		{type = "box", size = {2, 6, 260}, pos = {-150, 0, 0}, axis = "x"},
+		{type = "box", size = {500, 6, 2}, pos = {0, 0, 250}, axis = "z"},
+		{type = "box", size = {500, 6, 2}, pos = {0, 0, -250}, axis = "z"},
+		{type = "box", size = {2, 6, 500}, pos = {250, 0, 0}, axis = "x"},
+		{type = "box", size = {2, 6, 500}, pos = {-250, 0, 0}, axis = "x"},
 	},
 	ground = {
-		size = {260, 0.2, 260},
+		size = {500, 0.2, 500},
 		color = {0.2, 0.21, 0.24},
 	},
 	spawn_points = {
-		{-10, 0.5, -180, 0},
-		{-6, 0.5, -180, 0},
-		{-2, 0.5, -180, 0},
-		{2, 0.5, -180, 0},
-		{6, 0.5, -180, 0},
-		{10, 0.5, -180, 0},
+		{-120, 0.6, -170, 0},
+		{-110, 0.6, -170, 0},
+		{-100, 0.6, -170, 0},
+		{-90, 0.6, -170, 0},
+		{-80, 0.6, -170, 0},
+		{-70, 0.6, -170, 0},
 	},
 	waypoints = {
 		{-120, 0.5, -160},

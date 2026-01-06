@@ -59,14 +59,15 @@ local function new_racer(id, is_ai, spawn)
 		rot = {0, (spawn and spawn.yaw) or 0, 0},
 		lap = 1,
 		checkpoint = 0,
-		lap_gate = false,
-		wasted = false,
-		finished = false,
-		behind_timer = 0,
-		input = {throttle = 0, brake = 0, steer = 0, drift = false, boost = false},
-		progress = 0,
-		waypoint = 1,
-	}
+	lap_gate = false,
+	wasted = false,
+	finished = false,
+	finish_time = nil,
+	behind_timer = 0,
+	input = {throttle = 0, brake = 0, steer = 0, drift = false, boost = false},
+	progress = 0,
+	waypoint = 1,
+}
 end
 
 local function add_ai_racers(state)
@@ -127,6 +128,9 @@ local function apply_input(racer, delta, state)
 	end
 	if racer.lap > state.laps then
 		racer.finished = true
+		if not racer.finish_time then
+			racer.finish_time = state.elapsed
+		end
 	end
 	update_progress(racer, state, segment_progress)
 end
@@ -177,6 +181,9 @@ local function ai_tick(racer, delta, state)
 	racer.checkpoint = (racer.waypoint - 1) % state.checkpoints
 	if racer.lap > state.laps then
 		racer.finished = true
+		if not racer.finish_time then
+			racer.finish_time = state.elapsed
+		end
 	end
 	local prev_wp = racer.waypoint - 1
 	if prev_wp < 1 then prev_wp = #state.waypoints end
@@ -200,6 +207,7 @@ local function broadcast_snapshot(dispatcher, state)
 			checkpoint = r.checkpoint,
 			wasted = r.wasted,
 			finished = r.finished,
+			finish_time = r.finish_time,
 			progress = r.progress,
 		})
 	end

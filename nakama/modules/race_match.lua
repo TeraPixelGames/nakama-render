@@ -184,9 +184,13 @@ local function broadcast_snapshot(dispatcher, state)
 			checkpoint = r.checkpoint,
 			wasted = r.wasted,
 			finished = r.finished,
+			progress = r.progress,
 		})
 	end
-	dispatcher.broadcast_message(OP.RACE_SNAPSHOT, nk.json_encode({racers = racers}))
+	dispatcher.broadcast_message(OP.RACE_SNAPSHOT, nk.json_encode({
+		racers = racers,
+		checkpoints = state.checkpoints,
+	}))
 end
 
 local function evaluate_wasted(dispatcher, state, delta)
